@@ -1,0 +1,13 @@
+# Akida examples requirements
+imageio == 2.15.0
+imblearn
+jupyter
+matplotlib
+numpy == 1.23.0
+pandas
+progressbar
+scikit-learn
+tensorflow-datasets
+tabulate
+trimesh
+

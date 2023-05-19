@@ -1,0 +1,12 @@
+[console_scripts]
+akida_models = akida_models.cli:main
+centernet_train = akida_models.centernet.centernet_train:main
+cwru_train = akida_models.cwru.cwru_train:main
+dvs_train = akida_models.dvs.dvs_train:main
+imagenet_train = akida_models.imagenet.imagenet_train:main
+kws_train = akida_models.kws.kws_train:main
+mnist_train = akida_models.mnist.mnist_train:main
+modelnet40_train = akida_models.modelnet40.modelnet40_train:main
+portrait128_train = akida_models.portrait128.portrait128_train:main
+utk_face_train = akida_models.utk_face.utk_face_train:main
+yolo_train = akida_models.detection.yolo_train:main

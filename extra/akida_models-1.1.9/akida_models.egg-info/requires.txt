@@ -1,0 +1,8 @@
+cnn2snn~=2.2.2
+quantizeml~=0.3.1
+scipy
+opencv-python
+mtcnn
+imgaug
+trimesh
+tensorflow-addons>=0.18.0

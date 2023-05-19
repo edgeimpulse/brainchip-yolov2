@@ -1,0 +1,4 @@
+# Akida models
+
+This package contains a zoo of TensorFlow/Keras defined models that can be
+quantized and that are compatible for Akida conversion.

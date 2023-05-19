@@ -49,16 +49,15 @@ COPY . ./
 RUN wget http://data.brainchip.com/dataset-mirror/voc/voc_test_car_person.tar.gz
 #RUN export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 RUN akida_models create -s yolo_akidanet_voc.h5 yolo_base -c 2 -bw akidanet_imagenet_alpha_50.h5
-RUN echo "Model created"
 
 RUN python3 01.preprocess.py
 
-#RUN yolo_train train -d voc_preprocessed.pkl -m yolo_akidanet_voc.h5 -ap voc_anchors.pkl -e 1 -fb 1conv -s yolo_akidanet_voc.h5
-#RUN cnn2snn quantize -m yolo_akidanet_voc.h5 -iq 8 -wq 4 -aq 4
-#RUN yolo_train extract -d voc_preprocessed.pkl -ap voc_anchors.pkl -b 1024 -o voc_samples.npz -m yolo_akidanet_voc_iq8_wq4_aq4.h5
-#RUN cnn2snn calibrate adaround -sa voc_samples.npz -b 128 -e 1 -lr 1e-3 -m yolo_akidanet_voc_iq8_wq4_aq4.h5
-#RUN yolo_train extract -d voc_preprocessed.pkl -ap voc_anchors.pkl -b 1024 -o voc_samples.npz -m yolo_akidanet_voc_iq8_wq4_aq4.h5
-#RUN cnn2snn calibrate adaround -sa voc_samples.npz -b 128 -e 1 -lr 1e-3 -m yolo_akidanet_voc_iq8_wq4_aq4.h5
+RUN yolo_train train -d voc_preprocessed.pkl -m yolo_akidanet_voc.h5 -ap voc_anchors.pkl -e 1 -fb 1conv -s yolo_akidanet_voc.h5
+RUN cnn2snn quantize -m yolo_akidanet_voc.h5 -iq 8 -wq 4 -aq 4
+RUN yolo_train extract -d voc_preprocessed.pkl -ap voc_anchors.pkl -b 1024 -o voc_samples.npz -m yolo_akidanet_voc_iq8_wq4_aq4.h5
+RUN cnn2snn calibrate adaround -sa voc_samples.npz -b 128 -e 1 -lr 1e-3 -m yolo_akidanet_voc_iq8_wq4_aq4.h5
+RUN yolo_train extract -d voc_preprocessed.pkl -ap voc_anchors.pkl -b 1024 -o voc_samples.npz -m yolo_akidanet_voc_iq8_wq4_aq4.h5
+RUN cnn2snn calibrate adaround -sa voc_samples.npz -b 128 -e 1 -lr 1e-3 -m yolo_akidanet_voc_iq8_wq4_aq4.h5
 
 #RUN python3 04.metrics.py
 #RUN ./run.sh

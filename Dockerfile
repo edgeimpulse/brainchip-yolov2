@@ -34,24 +34,26 @@ RUN pip3 install cnn2snn
 RUN pip3 install akida-models
 RUN pip3 install -r requirements-mini.txt
 RUN pip3 install protobuf==3.19.0
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 WORKDIR /scripts
 
 # Grab akidanet imagenet pretrained weights to be used for yolov2
 RUN wget http://data.brainchip.com/models/akidanet/akidanet_imagenet_224_alpha_50.h5
-RUN mv akidanet_imagenet_224_alpha_50.h5 akidanet_imagenet_alpha_50.h5
+#RUN mv akidanet_imagenet_224_alpha_50.h5 akidanet_imagenet_alpha_50.h5
 
 WORKDIR /scripts
 
 # Copy the normal files (e.g. run.sh and the extract_dataset scripts, etc. in)
 COPY . ./
 
-RUN wget http://data.brainchip.com/dataset-mirror/voc/voc_test_car_person.tar.gz
-#RUN export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
-RUN akida_models create -s yolo_akidanet_voc.h5 yolo_base -c 2 -bw akidanet_imagenet_alpha_50.h5
-RUN echo "Model created"
+#RUN wget http://data.brainchip.com/dataset-mirror/voc/voc_test_car_person.tar.gz --> don't need
 
-RUN python3 01.preprocess.py
+#RUN export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+#RUN akida_models create -s yolo_akidanet_voc.h5 yolo_base -c 2 -bw akidanet_imagenet_alpha_50.h5
+#RUN echo "Model created"
+
+#RUN python3 01.preprocess.py
 
 #RUN yolo_train train -d voc_preprocessed.pkl -m yolo_akidanet_voc.h5 -ap voc_anchors.pkl -e 1 -fb 1conv -s yolo_akidanet_voc.h5
 #RUN cnn2snn quantize -m yolo_akidanet_voc.h5 -iq 8 -wq 4 -aq 4

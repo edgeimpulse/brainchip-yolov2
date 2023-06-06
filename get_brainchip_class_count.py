@@ -10,6 +10,8 @@ args = parser.parse_args()
 with open(os.path.join(args.data_directory, 'Y_split_train.npy'), 'r') as f:
     Y_train = json.loads(f.read())
 
+class_count = 0
+
 for ix in range(0, len(Y_train)):
     labels = Y_train[ix]['boundingBoxes']
 

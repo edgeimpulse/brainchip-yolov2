@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "config": {
+        "edgeimpulse.com": {
+            "name": "akida-yolov2-byom",
+            "type": "transferLearning",
+            "description": "Akidanet based YOLOv2 for Brainchip",
+            "organizationId": 5101,
+            "tlObjectDetectionLastLayer": "yolov5",
+            "tlOperatesOn": "object_detection",
+            "id": 1631
+        }
+    }
+}

@@ -3,12 +3,26 @@
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 
+import argparse, pickle 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
+from tensorflow.keras import Model
+from tensorflow.keras.layers import Reshape
 from akida_models.detection.processing import load_image, preprocess_image, decode_output
 
+
+with open("preprocessed_anchors.pkl", 'rb') as handle:
+        anchors = pickle.load(handle)
+
+with open('preprocessed_data.pkl', 'rb') as handle:
+        all_data, val_data, labels = pickle.load(handle)
+
+
+model_akida = Model("converted_akida_model.h5")
+
+
+#------------------------------------------------------------
 # Take a random test image
 i = np.random.randint(len(val_data))
 
@@ -42,7 +56,7 @@ pred_boxes = np.array([[
     box.get_score()
 ] for box in raw_boxes])
 
-fig = plt.figure(num='VOC2012 car and person detection by Akida runtime')
+fig = plt.figure(num='YOLOv2 object detection by Akida runtime')
 ax = fig.subplots(1)
 img_plot = ax.imshow(np.zeros(raw_image.shape, dtype=np.uint8))
 img_plot.set_data(raw_image)

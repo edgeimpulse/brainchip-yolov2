@@ -3,6 +3,17 @@ import pickle
 import argparse, math, shutil, os, json, time
 from PIL import Image
 
+from datetime import datetime
+
+# datetime object containing current date and time
+now = datetime.now()
+
+# dd/mm/YY H:M:S
+dt_string = now.strftime("%d/%m/%Y %H:%M")
+print("Current Run =", dt_string)
+
+
+
 parser = argparse.ArgumentParser(description='Edge Impulse => Brainchip YOLOv2')
 parser.add_argument('--data-directory', type=str, required=True)
 parser.add_argument('--out-directory', type=str, required=True)

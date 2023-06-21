@@ -120,10 +120,6 @@ yolo_train tune --data preprocessed_data.pkl \
         --epochs $EPOCHS \
         --savemodel akidanet_yolo_trained_iq8_wq4_aq4.h5
 
-# for file in *
-# do
-#   echo "$file"
-# done
 
 echo " "
 echo "Getting metrics for quantized model"
@@ -132,13 +128,24 @@ python3 get_brainchip_metrics.py --grid-size 7 \
         --classes $CLASSES
 
 
+for file in *
+do
+  echo "$file"
+done
+
+
 echo " "
 echo "Initiating conversion of quantized model to Akida"
 python3 convert_to_akida.py --grid-size 7 \
         --num-anchors 5 \
-        --classes $CLASSES
+        --classes $CLASSES \
+        --out-directory $OUT_DIRECTORY
 
 
-echo " "
-echo "Running Predictions"
-python3 06.predict.py
+
+
+# echo " "
+# echo "Running Predictions on model"
+# python3 run_akida_predictions.py --grid-size 7 \
+#         --num-anchors 5 \
+#         --classes $CLASSES 

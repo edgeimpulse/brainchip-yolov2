@@ -15,12 +15,14 @@ from timeit import default_timer as timer
 from akida_models.detection.map_evaluation import MapEvaluation
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Reshape
+from conversion import convert_to_float32
 
 
 parser = argparse.ArgumentParser(description='Brainchip Akida EI YOLOv2 Metric Evaluation')
 parser.add_argument('--grid-size', type=int, required=True)
 parser.add_argument('--num-anchors', type=int, required=True)
 parser.add_argument('--classes', type=int, required=True)
+parser.add_argument('--out-directory', type=str, required=True)
 
 args = parser.parse_args()
 
@@ -62,7 +64,17 @@ compatible_model = Model(model_keras.input, model_keras.layers[-2].output)
 
 model_akida = convert(compatible_model)
 model_akida.summary()
-model_akida.save("converted_akida_model.h5")
+model_akida.save("converted_akida_model.fbz")
+model_keras.save("converted_akida_model.h5")
+
+print("Model Saved as converted_akida_model.fbz and converted_akida_model.h5")
+
+MODEL_INPUT_SHAPE = model_keras.input.shape[1:]
+print("Model Input Shape: ", MODEL_INPUT_SHAPE)
+
+# Create tflite files (f32 / i8)
+convert_to_float32(model_keras, args.out_directory, MODEL_INPUT_SHAPE, 'model.tflite')
+
 
 ######################################################################
 # 6.1 Check performance
@@ -104,4 +116,5 @@ print("----------------------------------------------------------------")
 print('mAP: {:.4f}'.format(mAP_ak))
 print(f'Akida inference on {num_images} images took {end-start:.2f} s.\n')
 print("----------------------------------------------------------------")
-print("Model Saved")
+
+

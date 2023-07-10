@@ -14,6 +14,7 @@ from cnn2snn import load_quantized_model, check_model_compatibility, convert
 from timeit import default_timer as timer
 from akida_models.detection.map_evaluation import MapEvaluation
 from tensorflow.keras import Model
+from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Reshape
 from conversion import convert_to_float32
 
@@ -35,6 +36,7 @@ with open("preprocessed_anchors.pkl", 'rb') as handle:
 
 # Load the pretrained model along with anchors
 pretrained_model, anchors = load_quantized_model("akidanet_yolo_trained_iq8_wq4_aq4.h5"), anchors
+float32_model = load_model("akidanet_yolo_trained.h5")
 
 with open('preprocessed_data.pkl', 'rb') as handle:
         all_data, val_data, labels = pickle.load(handle)
@@ -43,6 +45,8 @@ with open('preprocessed_data.pkl', 'rb') as handle:
 output = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), name="YOLO_output")(pretrained_model.output)
 model_keras = Model(pretrained_model.input, output)
 
+output = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), name="YOLO_output")(float32_model.output)
+model_keras_f32 = Model(float32_model.input, output)
 
 # Check model compatibility
 compatibility = check_model_compatibility(model_keras, False)
@@ -65,7 +69,7 @@ compatible_model = Model(model_keras.input, model_keras.layers[-2].output)
 model_akida = convert(compatible_model)
 model_akida.summary()
 model_akida.save("converted_akida_model.fbz")
-model_keras.save("converted_akida_model.h5")
+model_keras_f32.save("converted_akida_model.h5")
 
 print("Model Saved as converted_akida_model.fbz and converted_akida_model.h5")
 
@@ -73,7 +77,7 @@ MODEL_INPUT_SHAPE = model_keras.input.shape[1:]
 print("Model Input Shape: ", MODEL_INPUT_SHAPE)
 
 # Create tflite files (f32 / i8)
-convert_to_float32(model_keras, args.out_directory, MODEL_INPUT_SHAPE, 'model.tflite')
+convert_to_float32(model_keras_f32, args.out_directory, MODEL_INPUT_SHAPE, 'model.tflite')
 
 
 ######################################################################

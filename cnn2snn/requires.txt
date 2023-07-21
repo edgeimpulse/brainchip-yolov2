@@ -1,0 +1,3 @@
+tensorflow==2.7.0
+keras==2.7.0
+akida==2.2.2

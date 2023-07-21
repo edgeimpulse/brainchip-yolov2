@@ -11,6 +11,6 @@ tensorflow-datasets
 tabulate
 trimesh
 tflite==2.4.0
-protobuf==3.20.*
+protobuf==3.19.0
 pyyaml
 h5py

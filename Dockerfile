@@ -1,5 +1,5 @@
 ## syntax = docker/dockerfile:experimental
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 ## Avoid confirmation dialogs
 ENV DEBIAN_FRONTEND=noninteractive
@@ -24,14 +24,12 @@ RUN yes | ./install_tensorflow.sh
 
 ## Local dependencies
 COPY requirements-mini.txt ./
-
-RUN pip3 install -r requirements-mini.txt 
-
-RUN pip3 install akida
-RUN pip3 install cnn2snn
-RUN pip3 install akida-models
+COPY download_cnn2snn.sh ./
+COPY cnn2snn ./cnn2snn
+RUN sh /app/download_cnn2snn.sh
+RUN pip3 install /app/cnn2snn-2.2.2
+RUN pip3 install akida-models==1.1.3
 RUN pip3 install -r requirements-mini.txt
-RUN pip3 install protobuf==3.19.0
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 #WORKDIR /usr/local/lib/python3.10/dist-packages/akida_models/detection

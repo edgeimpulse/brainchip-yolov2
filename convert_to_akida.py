@@ -17,7 +17,7 @@ from tensorflow.keras import Model
 from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Reshape
 from conversion import convert_to_float32
-import os
+import os, zipfile
 
 
 parser = argparse.ArgumentParser(description='Brainchip Akida EI YOLOv2 Metric Evaluation')
@@ -70,9 +70,15 @@ compatible_model = Model(model_keras.input, model_keras.layers[-2].output)
 model_akida = convert(compatible_model)
 model_akida.summary()
 model_akida.save(os.path.join(args.out_directory, "akida_model.fbz"))
-model_keras_f32.save("converted_akida_model.h5")
+h5_path = os.path.join(args.out_directory, "model.h5")
+model_keras_f32.save(h5_path, save_format='h5')
+with zipfile.ZipFile(h5_path + '.zip', "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.write(h5_path, os.path.basename(h5_path))
+os.remove(h5_path)
+print("Model Saved as akida_model.fbz and model.h5.zip")
 
-print("Model Saved as converted_akida_model.fbz and converted_akida_model.h5")
+saved_model_dir = os.path.join(args.out_directory, "saved_model")
+model_keras_f32.save(saved_model_dir, save_format='tf')
 
 MODEL_INPUT_SHAPE = model_keras.input.shape[1:]
 print("Model Input Shape: ", MODEL_INPUT_SHAPE)

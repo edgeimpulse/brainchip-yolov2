@@ -1,4 +1,4 @@
-# Local training pipeline for "Saniea Akhtar / Image Classification - BYOM YOLOv5"
+# Local training pipeline for "Edge Impulse Inc. / BRAINCHIP-Akida-YOLOv2-BYOM"
 
 This is the local training pipeline (based on Keras / TensorFlow) for your Edge Impulse project [Edge Impulse Inc. / BRAINCHIP-Akida-YOLOv2-BYOM](https://studio.edgeimpulse.com/studio/200018) (http://localhost:4800/studio/200018). Use it to train your model locally or run experiments. Once you're done with experimentation you can push the model back into Edge Impulse, and retrain from there.
 

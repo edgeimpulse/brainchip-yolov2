@@ -32,15 +32,15 @@ classes = args.classes
 grid_size = (args.grid_size, args.grid_size)
 num_anchors = args.num_anchors
 
-with open("preprocessed_anchors.pkl", 'rb') as handle:
-        anchors = pickle.load(handle)
+with open(os.path.join(args.out_directory, "akida_yolov2_anchors.pkl"), 'rb') as handle:
+    anchors = pickle.load(handle)
 
 # Load the pretrained model along with anchors
 pretrained_model, anchors = load_quantized_model("akidanet_yolo_trained_iq8_wq4_aq4.h5"), anchors
 float32_model = load_model("akidanet_yolo_trained.h5")
 
 with open('preprocessed_data.pkl', 'rb') as handle:
-        all_data, val_data, labels = pickle.load(handle)
+    all_data, val_data, labels = pickle.load(handle)
 
 # Define the final reshape and build the model
 output = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), name="YOLO_output")(pretrained_model.output)
@@ -58,6 +58,7 @@ compatibility = check_model_compatibility(model_keras, False)
 
 # Rebuild a model without the last layer
 compatible_model = Model(model_keras.input, model_keras.layers[-2].output)
+model_keras_f32 = Model(model_keras_f32.input, model_keras_f32.layers[-2].output)
 
 ######################################################################
 # When converting to an Akida model, we just need to pass the Keras model
@@ -73,7 +74,7 @@ model_akida.save(os.path.join(args.out_directory, "akida_model.fbz"))
 h5_path = os.path.join(args.out_directory, "model.h5")
 model_keras_f32.save(h5_path, save_format='h5')
 with zipfile.ZipFile(h5_path + '.zip', "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.write(h5_path, os.path.basename(h5_path))
+    zf.write(h5_path, os.path.basename(h5_path))
 os.remove(h5_path)
 print("Model Saved as akida_model.fbz and model.h5.zip")
 
@@ -127,5 +128,3 @@ print("----------------------------------------------------------------")
 print('mAP: {:.4f}'.format(mAP_ak))
 print(f'Akida inference on {num_images} images took {end-start:.2f} s.\n')
 print("----------------------------------------------------------------")
-
-

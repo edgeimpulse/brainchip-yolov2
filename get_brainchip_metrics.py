@@ -35,9 +35,10 @@ from tensorflow.keras import Model
 from tensorflow.keras.layers import Reshape
 
 parser = argparse.ArgumentParser(description='Brainchip Akida EI YOLOv2 Metric Evaluation')
-parser.add_argument('--grid-size', type=int, required=True)
-parser.add_argument('--num-anchors', type=int, required=True)
+parser.add_argument('--grid_size', type=int, required=True)
+parser.add_argument('--num_anchors', type=int, required=True)
 parser.add_argument('--classes', type=int, required=True)
+parser.add_argument('--anchors_path', type=str, required=True)
 
 args = parser.parse_args()
 
@@ -47,10 +48,9 @@ grid_size = (args.grid_size, args.grid_size)
 num_anchors = args.num_anchors
 # num_anchors = 5
 
-# anchors_path = "preprocessed_anchors.pkl"
 # model_path   = "akidanet_yolo_trained_iq8_wq4_aq4.h5"
 
-with open("preprocessed_anchors.pkl", 'rb') as handle:
+with open(args.anchors_path, 'rb') as handle:
         anchors = pickle.load(handle)
 
 # Load the pretrained model along with anchors

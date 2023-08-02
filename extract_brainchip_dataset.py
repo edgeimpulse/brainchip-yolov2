@@ -3,20 +3,10 @@ import pickle
 import argparse, math, shutil, os, json, time
 from PIL import Image
 
-from datetime import datetime
-
-# datetime object containing current date and time
-now = datetime.now()
-
-# dd/mm/YY H:M:S
-dt_string = now.strftime("%d/%m/%Y %H:%M")
-print("Current Run =", dt_string)
-
-
-
-parser = argparse.ArgumentParser(description='Edge Impulse => Brainchip YOLOv2')
+parser = argparse.ArgumentParser(description='Edge Impulse dataset => Brainchip YOLOv2 dataset')
 parser.add_argument('--data-directory', type=str, required=True)
 parser.add_argument('--out-directory', type=str, required=True)
+parser.add_argument('--temp-directory', type=str, required=True)
 # parser.add_argument('--anchors', type=int, required=True)
 
 args = parser.parse_args()
@@ -34,25 +24,24 @@ with open(os.path.join(args.data_directory, 'Y_split_test.npy'), 'r') as f:
 image_width, image_height, image_channels = list(X_train.shape[1:])
 
 # delete any previously existing versions of this data
-out_dir = args.out_directory
-if os.path.exists(out_dir) and os.path.isdir(out_dir):
-    shutil.rmtree(out_dir)
+if os.path.exists(args.temp_directory) and os.path.isdir(args.temp_directory):
+    shutil.rmtree(args.temp_directory)
 
-class_count = 0
-
-print('Transforming Edge Impulse data format into something compatible with Brainchip\'s YOLOv2 training pipeline')
+print('Converting dataset')
 
 def current_ms():
     return round(time.time() * 1000)
 
+# helper variables for pretty info prints
 total_images = len(X_train) + len(X_test)
 zf = len(str(total_images))
-last_printed = current_ms()
 converted_images = 0
 
+class_count = 0
 
 def convert(X, Y, category):
-    global class_count, total_images, zf, last_printed, converted_images
+    global class_count, total_images, zf, converted_images
+    last_printed = current_ms()
 
     # List to hold all the dictionaries holding data for each image
     all_data = []
@@ -65,8 +54,8 @@ def convert(X, Y, category):
         labels = Y[ix]['boundingBoxes']
 
         # Save images to directory to pass to YoloV2
-        images_dir = os.path.join(out_dir, category, 'images')
-        labels_dir = os.path.join(out_dir, category, 'labels')
+        images_dir = os.path.join(args.temp_directory, category, 'images')
+        labels_dir = os.path.join(args.temp_directory, category, 'labels')
         os.makedirs(images_dir, exist_ok=True)
         os.makedirs(labels_dir, exist_ok=True)
 
@@ -98,16 +87,6 @@ def convert(X, Y, category):
             width = w / image_width
             height = h / image_height
 
-
-            # NOT SURE IF THIS IS BEING USED IN THE TRAINING OR NOT
-            # # to create text file with image name and label info
-            # labels_text.append(str(l['label'] - 1) + ' ' + str(x_center) + ' ' + str(y_center) + ' ' + str(width) + ' ' + str(height))
-
-            # # Save label and centroid data of each image in its own file
-            # with open(os.path.join(labels_dir, 'image' + str(ix).zfill(5) + '.txt'), 'w') as f:
-            #     f.write('\n'.join(labels_text))
-
-
             # Dimensions of one bounding box as required by Brainchip
             x1 = x
             x2 = x1 + w
@@ -137,8 +116,7 @@ def convert(X, Y, category):
             print('[' + str(converted_images).rjust(zf) + '/' + str(total_images) + '] Converting images...')
             last_printed = current_ms()
 
-
-    return(all_data)
+    return all_data
 
 
 all_train_data = convert(X=X_train, Y=Y_train, category='train')
@@ -146,17 +124,13 @@ all_valid_data = convert(X=X_test, Y=Y_test, category='valid')
 
 print('[' + str(converted_images).rjust(zf) + '/' + str(total_images) + '] Converting images...')
 
-print('Transforming Edge Impulse data format into something compatible with Brainchip\'s YOLOv2 OK')
+print('Converting dataset OK')
 print('')
 
 labels = []
 for c in range(0, class_count):
     # labels.append("class" + str(c))
     labels.append(str(c))
-
-# print("length of labels: ", len(labels))
-# print("labels: ", labels)
-
 
 # Combine all preprocessed data into one dataset to dump in pickle file for akida training
 dataset = []
@@ -167,19 +141,17 @@ dataset.append(labels)
 with open('preprocessed_data.pkl', 'wb') as file:
     pickle.dump(dataset, file)
 
-
-
+print('Generating YOLOv2 anchors...')
 # Generate anchors for Brainchip's akida YOLOv2 training using the YOLO toolkit
-
 from akida_models.detection.generate_anchors import generate_anchors
 
-# num_of_anchors = args.anchors
+# below are default values for generate_anchors function
 num_of_anchors = 5
 grid_size = (7, 7)
-
 anchors = generate_anchors(all_train_data, num_of_anchors, grid_size)
 
-print(" ")
-
-with open('preprocessed_anchors.pkl', 'wb') as file:
+print(f"Saving anchors to {os.path.join(args.out_directory, 'akida_yolov2_anchors.pkl')}")
+with open(os.path.join(args.out_directory, 'akida_yolov2_anchors.pkl'), 'wb') as file:
     pickle.dump(anchors, file)
+
+print('Generating YOLOv2 anchors OK')

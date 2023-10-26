@@ -63,13 +63,13 @@ CLASSES=$(python3 get_brainchip_class_count.py --data-directory "$DATA_DIRECTORY
 
 ########### REMOVE WHEN TESTING IN STUDIO!! ####################
 
-# ## The `-d` test command option see if FILE exists and is a directory ##
-# if [ -d $OUT_DIRECTORY ]; then
-#     rm -rf $OUT_DIRECTORY
-#     exit 1
-# fi
+## The `-d` test command option see if FILE exists and is a directory ##
+if [ -d $OUT_DIRECTORY ]; then
+    rm -rf $OUT_DIRECTORY
+    exit 1
+fi
 
-# mkdir "$OUT_DIRECTORY"
+mkdir "$OUT_DIRECTORY"
 
 ls -r
 echo " "

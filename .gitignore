@@ -1,1 +1,3 @@
 .ei-block-config
+.DS_Store
+.dockerignore

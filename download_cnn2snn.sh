@@ -14,3 +14,5 @@ cp cnn2snn/setup.py cnn2snn-2.2.2
 rm cnn2snn-2.2.2/cnn2snn.egg-info/requires.txt
 cp cnn2snn/requires.txt cnn2snn-2.2.2/cnn2snn.egg-info
 
+echo 'files replaced'
+

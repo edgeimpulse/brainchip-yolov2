@@ -13,7 +13,7 @@ You run this pipeline via Docker. This encapsulates all dependencies and package
 3. Build the container:
 
     ```
-    $ docker build -t custom-block-200018 .
+    docker build -t custom-block-200018 .
     ```
 
 4. Train your model:
@@ -21,13 +21,13 @@ You run this pipeline via Docker. This encapsulates all dependencies and package
     **macOS, Linux**
 
     ```
-    $ docker run --rm -v $PWD:/scripts custom-block-200018 --data-directory data --out-directory out
+    docker run --rm -v $PWD:/scripts custom-block-200018 --data-directory data --out-directory out --epochs 10 --learning-rate 0.001
     ```
 
     **Windows**
 
     ```
-    $ docker run --rm -v "%cd%":/scripts custom-block-200018 --data-directory data --out-directory out
+    docker run --rm -v "%cd%":/scripts custom-block-200018 --data-directory data --out-directory out --epochs 10 --learning-rate 0.001
     ```
 
 5. This will write your model (in TFLite, Saved Model and H5 format) to the `out/` directory.
@@ -45,7 +45,7 @@ To get up-to-date data from your project:
 3. Fetch new data via:
 
     ```
-    $ edge-impulse-blocks runner --download-data data/
+    edge-impulse-blocks runner --download-data data/
     ```
 
 ## Pushing this block back to Edge Impulse
@@ -59,7 +59,7 @@ You can also push this block back to Edge Impulse, that makes it available like 
 5. Push the block to Edge Impulse via:
 
     ```
-    $ edge-impulse-blocks push
+    edge-impulse-blocks push
     ```
 
 6. Depending on the data your block operates on, you can add it via:

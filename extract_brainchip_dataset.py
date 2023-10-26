@@ -1,5 +1,5 @@
 import numpy as np
-import pickle
+import pickle, os
 import argparse, math, shutil, os, json, time
 from PIL import Image
 
@@ -138,9 +138,20 @@ dataset.append(all_train_data)
 dataset.append(all_valid_data)
 dataset.append(labels)
 
-with open('preprocessed_data.pkl', 'wb') as file:
+print(os.getcwd())
+print(os.listdir(os.getcwd()))
+print(os.listdir(os.path.join(os.getcwd(), 'output')))
+
+print(" ")
+print(f"Saving preprocessed data to {os.path.join(args.out_directory, 'preprocessed_data.pkl')}")
+
+with open(os.path.join(args.out_directory, 'preprocessed_data.pkl'), 'wb') as file:
+# with open('preprocessed_data.pkl', 'wb') as file:
     pickle.dump(dataset, file)
 
+print(os.listdir(os.getcwd()))
+
+print(" ")
 print('Generating YOLOv2 anchors...')
 # Generate anchors for Brainchip's akida YOLOv2 training using the YOLO toolkit
 from akida_models.detection.generate_anchors import generate_anchors
@@ -150,8 +161,19 @@ num_of_anchors = 5
 grid_size = (7, 7)
 anchors = generate_anchors(all_train_data, num_of_anchors, grid_size)
 
+print(" ")
 print(f"Saving anchors to {os.path.join(args.out_directory, 'akida_yolov2_anchors.pkl')}")
+
 with open(os.path.join(args.out_directory, 'akida_yolov2_anchors.pkl'), 'wb') as file:
+# with open('akida_yolov2_anchors.pkl', 'wb') as file:    
     pickle.dump(anchors, file)
+
+print(" ")
+print(os.getcwd())
+print(" ")
+print(os.listdir(os.getcwd()))
+print(" ")
+print(os.listdir(os.path.join(os.getcwd(), 'output')))
+print(" ")
 
 print('Generating YOLOv2 anchors OK')

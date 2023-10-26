@@ -108,6 +108,12 @@ def train(model, train_data, valid_data, anchors, labels, obj_threshold,
 
     callbacks = [early_stop_cb, map_evaluator_cb]
 
+    print("steps_per_epoch: ", len(train_generator) * TRAIN_TIMES)
+    print("epochs: ", epochs)
+    print("Train Generator:")
+    print(train_generator)
+
+
     # Start the training process
     model.fit(x=train_generator,
               steps_per_epoch=len(train_generator) * TRAIN_TIMES,

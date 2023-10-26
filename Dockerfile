@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 WORKDIR /usr/local/lib/python3.10/dist-packages/akida_models/detection
 RUN rm yolo_train.py
-COPY yolo_train.py
+COPY yolo_train.py /usr/local/lib/python3.10/dist-packages/akida_models/detection/yolo_train.py
 
 #RUN rm map_evaluation.py
 #COPY map_evaluation.py ./

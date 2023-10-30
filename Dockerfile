@@ -25,14 +25,13 @@ RUN yes | ./install_tensorflow.sh
 ## Local dependencies
 COPY requirements-mini.txt ./
 COPY download_cnn2snn.sh ./
-COPY download_akida-models.sh ./
 COPY cnn2snn ./cnn2snn
-COPY akida-mod ./akida-mod
-
 RUN sh /app/download_cnn2snn.sh
-RUN sh /app/download_akida-models.sh
-
 RUN pip3 install /app/cnn2snn-2.2.2
+
+COPY download_akida-models.sh ./
+COPY akida-mod ./akida-mod
+RUN sh /app/download_akida-models.sh
 RUN pip3 install /app/akida_models-1.1.3
 
 #RUN pip3 install akida-models==1.1.3

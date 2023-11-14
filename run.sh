@@ -94,8 +94,6 @@ akida_models create --save_model akidanet_yolo_base.h5 yolo_base \
         --base_weights akidanet_imagenet_224_alpha_50.h5
 
 
-
-
 echo " "
 echo "Initiating first training cycle"
 yolo_train train --data $OUT_DIRECTORY/preprocessed_data.pkl \
@@ -128,28 +126,32 @@ cnn2snn calibrate adaround --samples sample_data.npz \
         --learning_rate $LEARNING_RATE \
         --model akidanet_yolo_trained_iq8_wq4_aq4.h5
 
-# # *trained-model-filename*_iq8_wq4_aq4_adaround_calibrated.h5 <-- This file is generated using the name of the original trained model filename
-# echo " "
-# echo "Initiating final tuning of quantized model"
-# yolo_train tune --data preprocessed_data.pkl \
-#         --model akidanet_yolo_trained_iq8_wq4_aq4_adaround_calibrated.h5 \
-#         --anchors_path $OUT_DIRECTORY/akida_yolov2_anchors.pkl \
-#         --epochs $EPOCHS \
-#         --savemodel akidanet_yolo_trained_iq8_wq4_aq4.h5
+# *trained-model-filename*_iq8_wq4_aq4_adaround_calibrated.h5 <-- This file is generated using the name of the original trained model filename
+echo " "
+echo "Initiating final tuning of quantized model"
+yolo_train tune --data $OUT_DIRECTORY/preprocessed_data.pkl \
+        --model akidanet_yolo_trained_iq8_wq4_aq4_adaround_calibrated.h5 \
+        --anchors_path $OUT_DIRECTORY/akida_yolov2_anchors.pkl \
+        --epochs $EPOCHS \
+        --savemodel akidanet_yolo_trained_iq8_wq4_aq4.h5
 
-# echo " "
-# echo "Getting metrics for quantized model"
-# python3 get_brainchip_metrics.py --grid_size 7 \
-#         --num_anchors 5 \
-#         --classes $CLASSES \
-#         --anchors_path $OUT_DIRECTORY/akida_yolov2_anchors.pkl \
+echo " "
+echo "Getting metrics for quantized model"
+python3 get_brainchip_metrics.py --grid_size 7 \
+        --num_anchors 5 \
+        --classes $CLASSES \
+        --anchors_path $OUT_DIRECTORY/akida_yolov2_anchors.pkl \
+        --preprocessed_data_path $OUT_DIRECTORY/preprocessed_data.pkl
 
-# echo " "
-# echo "Initiating conversion of quantized model to Akida"
-# python3 convert_to_akida.py --grid-size 7 \
-#         --num-anchors 5 \
-#         --classes $CLASSES \
-#         --out-directory $OUT_DIRECTORY
+echo " "
+echo "Initiating conversion of quantized model to Akida"
+python3 convert_to_akida.py --grid-size 7 \
+        --num-anchors 5 \
+        --classes $CLASSES \
+        --out-directory $OUT_DIRECTORY \
+        --anchors_path $OUT_DIRECTORY/akida_yolov2_anchors.pkl \
+        --preprocessed_data_path $OUT_DIRECTORY/preprocessed_data.pkl
+
 
 # # echo " "
 # # echo "Running Predictions on model"

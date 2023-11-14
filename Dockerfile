@@ -44,7 +44,8 @@ RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 WORKDIR /scripts
 
 ## Grab akidanet imagenet pretrained weights to be used for yolov2
-RUN wget http://data.brainchip.com/models/akidanet/akidanet_imagenet_224_alpha_50.h5
+#RUN wget http://data.brainchip.com/models/akidanet/akidanet_imagenet_224_alpha_50.h5
+RUN wget https://data.brainchip.com/models/yolo/yolo_akidanet_voc.h5
 
 WORKDIR /scripts
 

@@ -21,7 +21,7 @@ You run this pipeline via Docker. This encapsulates all dependencies and package
     **macOS, Linux**
 
     ```
-    docker run --rm -v $PWD:/scripts custom-block-200018 --data-directory data --out-directory out --epochs 10 --learning-rate 0.001
+    docker run --rm -v $PWD:/scripts custom-block-200018 --data-directory data --out-directory out --epochs 10 --learning-rate 0.001 2>&1 | tee log.txt
     ```
 
     **Windows**

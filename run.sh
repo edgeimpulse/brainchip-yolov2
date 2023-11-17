@@ -77,6 +77,11 @@ echo "$OUT_DIRECTORY"
 
 ################### TILL HERE ##################################
 
+echo "HERE IS CONTENT OF YOLO_TRAIN"
+cat /usr/local/lib/python3.8/dist-packages/akida_models/detection/yolo_train.py
+echo "FILES DONE"
+
+
 # convert Edge Impulse dataset (in Numpy format, with JSON for labels into something YOLOv2 understands)
 echo " "
 echo "Extracting dataset for YOLOv2 and generating anchors"

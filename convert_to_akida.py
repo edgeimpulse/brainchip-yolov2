@@ -19,6 +19,8 @@ from tensorflow.keras.layers import Reshape
 from conversion import convert_to_float32
 import os, zipfile
 
+print("-------JOSH WAS HERE--------")
+
 
 parser = argparse.ArgumentParser(description='Brainchip Akida EI YOLOv2 Metric Evaluation')
 parser.add_argument('--grid-size', type=int, required=True)

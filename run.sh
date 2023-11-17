@@ -100,7 +100,6 @@ yolo_train train --data $OUT_DIRECTORY/preprocessed_data.pkl \
         --model akidanet_yolo_base.h5 \
         --anchors_path $OUT_DIRECTORY/akida_yolov2_anchors.pkl \
         --epochs $EPOCHS \
-        --freeze_before 1conv \
         --savemodel akidanet_yolo_trained.h5
 
 echo " "

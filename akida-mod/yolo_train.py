@@ -18,7 +18,6 @@
 Training script for YOLO models.
 """
 
-import os
 import pickle
 import argparse
 import numpy as np
@@ -27,13 +26,12 @@ from keras import Model
 from keras.layers import Reshape
 from keras.callbacks import EarlyStopping
 
-from cnn2snn import convert
+from cnn2snn import load_quantized_model, convert
 
 from .yolo_loss import YoloLoss
 from .map_evaluation import MapEvaluation
-from .batch_generator import BatchYoloGenerator
-from ..training import get_training_parser, freeze_model_before, compile_model, save_model
-from ..model_io import load_model
+from .batch_generator import BatchGenerator
+from ..training import get_training_parser, freeze_model_before, compile_model
 
 
 def get_data(data_path, anchors_path):
@@ -76,20 +74,20 @@ def train(model, train_data, valid_data, anchors, labels, obj_threshold,
     # Build batch generators
     input_shape = model.input.shape[1:]
 
-    train_generator = BatchYoloGenerator(input_shape=input_shape,
-                                         data=train_data,
-                                         grid_size=grid_size,
-                                         labels=labels,
-                                         anchors=anchors,
-                                         batch_size=batch_size)
+    train_generator = BatchGenerator(input_shape=input_shape,
+                                     data=train_data,
+                                     grid_size=grid_size,
+                                     labels=labels,
+                                     anchors=anchors,
+                                     batch_size=batch_size)
 
-    valid_generator = BatchYoloGenerator(input_shape=input_shape,
-                                         data=valid_data,
-                                         grid_size=grid_size,
-                                         labels=labels,
-                                         anchors=anchors,
-                                         batch_size=batch_size,
-                                         jitter=False)
+    valid_generator = BatchGenerator(input_shape=input_shape,
+                                     data=valid_data,
+                                     grid_size=grid_size,
+                                     labels=labels,
+                                     anchors=anchors,
+                                     batch_size=batch_size,
+                                     jitter=False)
 
     # Create callbacks
     early_stop_cb = EarlyStopping(monitor='val_loss',
@@ -106,13 +104,8 @@ def train(model, train_data, valid_data, anchors, labels, obj_threshold,
                                      obj_threshold=obj_threshold,
                                      nms_threshold=nms_threshold)
 
-    callbacks = [early_stop_cb, map_evaluator_cb]
-
-    print("steps_per_epoch: ", len(train_generator) * TRAIN_TIMES)
-    print("epochs: ", epochs)
-    print("Train Generator:")
-    print(train_generator)
-
+    # callbacks = [early_stop_cb, map_evaluator_cb]
+    callbacks = [map_evaluator_cb]
 
     # Start the training process
     model.fit(x=train_generator,
@@ -121,6 +114,8 @@ def train(model, train_data, valid_data, anchors, labels, obj_threshold,
               validation_data=valid_generator,
               callbacks=callbacks)
 
+print("Using modified script")
+print(train_generator)
 
 def evaluate(model, valid_data, anchors, labels, obj_threshold, nms_threshold):
     """ Evaluates model performances.
@@ -150,7 +145,7 @@ def evaluate(model, valid_data, anchors, labels, obj_threshold, nms_threshold):
 
 
 def extract_samples(im_size, data, grid_size, anchors, labels, num_samples, out_file):
-    """ Extract samples from data and save them to a npz file.
+    """ Extract samples from data and save them to a .npz file.
 
     Args:
         im_size (int): image size
@@ -161,12 +156,12 @@ def extract_samples(im_size, data, grid_size, anchors, labels, num_samples, out_
         num_samples (int): number of samples to extract
         out_file (str): name of output file
     """
-    data_generator = BatchYoloGenerator(input_shape=im_size,
-                                        data=data,
-                                        grid_size=grid_size,
-                                        labels=labels,
-                                        anchors=anchors,
-                                        batch_size=num_samples)
+    data_generator = BatchGenerator(input_shape=im_size,
+                                    data=data,
+                                    grid_size=grid_size,
+                                    labels=labels,
+                                    anchors=anchors,
+                                    batch_size=num_samples)
     np.savez(out_file, data_generator[0][0])
     print(f"Samples saved as {out_file}")
 
@@ -199,8 +194,13 @@ def main():
     parsers = get_training_parser(batch_size=128,
                                   freeze_before=True,
                                   tune=True,
-                                  extract=True,
                                   global_parser=global_parser)
+    subparser = parsers[-1]
+    extract_parser = subparser.add_parser("extract",
+                                          help="Extract samples",
+                                          parents=[global_parser])
+    extract_parser.add_argument("-o", "--out_file", type=str,
+                                default='widerface_samples.npz', help="Name of the output file.")
 
     args = parsers[0].parse_args()
 
@@ -209,7 +209,7 @@ def main():
                                                        args.anchors_path)
 
     # Load the source model
-    base_model = load_model(args.model)
+    base_model = load_quantized_model(args.model)
 
     # Create a final reshape layer for loss computation
     grid_size = base_model.output_shape[1:3]
@@ -234,16 +234,17 @@ def main():
                   loss=YoloLoss(anchors, grid_size, args.batch_size),
                   metrics=None)
 
-    # Disable QuantizeML assertions
-    os.environ["ASSERT_ENABLED"] = "0"
-
     # Train model
     if args.action in ["train", "tune"]:
         train(model, train_data, valid_data, anchors, labels, args.obj_thresh,
               args.nms_thresh, args.epochs, args.batch_size, grid_size)
-        # Remove the last reshape layer introduced for training
-        model = Model(model.input, model.layers[-2].output)
-        save_model(model, args.model, args.savemodel, args.action)
+
+        if args.savemodel:
+            # Remove the last reshape layer introduced for training
+            model = Model(model.input, model.layers[-2].output)
+            # Save the model
+            model.save(args.savemodel, include_optimizer=False)
+            print(f"Trained model saved as {args.savemodel}")
 
     elif args.action == 'eval':
         # Evaluate model accuracy
@@ -258,7 +259,7 @@ def main():
     elif args.action == 'extract':
         input_shape = model.input.shape[1:]
         extract_samples(input_shape, train_data, grid_size, anchors,
-                        labels, args.batch_size, args.savefile)
+                        labels, args.batch_size, args.out_file)
 
 
 if __name__ == "__main__":

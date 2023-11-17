@@ -24,6 +24,8 @@ RUN yes | ./install_tensorflow.sh
 
 ## Local dependencies
 COPY requirements-mini.txt ./
+RUN pip3 install akida==2.2.2
+
 COPY download_cnn2snn.sh ./
 COPY cnn2snn ./cnn2snn
 RUN sh /app/download_cnn2snn.sh
@@ -38,7 +40,7 @@ RUN pip3 install akida-models==1.1.3
 RUN pip3 install -r requirements-mini.txt
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
-#COPY yolo_train.py /usr/local/lib/python3.8/dist-packages/akida_models/detection/yolo_train.py
+COPY ./akida-mod/yolo_train.py /usr/local/lib/python3.8/dist-packages/akida_models/detection/yolo_train.py
 
 
 WORKDIR /scripts

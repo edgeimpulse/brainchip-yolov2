@@ -52,15 +52,19 @@ with open(args.preprocessed_data_path, 'rb') as handle:
 
 
 # Define the final reshape and build the model
-output = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), name="YOLO_output")(pretrained_model.output)
-model_keras = Model(pretrained_model.input, output)
+output_keras = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), name="YOLO_output")(pretrained_model.output)
+model_keras = Model(pretrained_model.input, output_keras)
 
-output = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), name="YOLO_output")(float32_model.output)
-model_keras_f32 = Model(float32_model.input, output)
+output_keras_32 = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), name="YOLO_output")(float32_model.output)
+model_keras_f32 = Model(float32_model.input, output_keras_32)
 
-# Check model compatibility
-print("Checking model compatibility: \n")
-compatibility = check_model_compatibility(model_keras, False)
+# Check model compatibility for model_keras
+print("Checking model compatibility for model_keras: \n")
+compatibility_keras = check_model_compatibility(model_keras, False)
+
+# Check model compatibility for model_keras_32
+print("Checking model compatibility for model_keras_f32: \n")
+compatibility_keras_32 = check_model_compatibility(model_keras_f32, False)
 
 ######################################################################
 # The last YOLO_output layer that was added for splitting channels into values
@@ -82,6 +86,7 @@ model_akida = convert(compatible_model)
 model_akida.summary()
 
 model_akida.save(os.path.join(args.out_directory, "akida_model.fbz"))
+
 h5_path = os.path.join(args.out_directory, "model.h5")
 model_keras_f32.save(h5_path, save_format='h5')
 

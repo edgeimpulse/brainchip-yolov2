@@ -76,6 +76,8 @@ def train(model, train_data, valid_data, anchors, labels, obj_threshold,
     # Build batch generators
     input_shape = model.input.shape[1:]
 
+    print("-------JOSH WAS HERE YOLO TRAIN--------")
+
     train_generator = BatchYoloGenerator(input_shape=input_shape,
                                          data=train_data,
                                          grid_size=grid_size,

@@ -114,8 +114,8 @@ def train(model, train_data, valid_data, anchors, labels, obj_threshold,
               validation_data=valid_generator,
               callbacks=callbacks)
 
-print("Using modified script")
-print(train_generator)
+    print("Using modified script")
+    print(train_generator)
 
 def evaluate(model, valid_data, anchors, labels, obj_threshold, nms_threshold):
     """ Evaluates model performances.

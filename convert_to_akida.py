@@ -27,6 +27,8 @@ parser.add_argument('--grid-size', type=int, required=True)
 parser.add_argument('--num-anchors', type=int, required=True)
 parser.add_argument('--classes', type=int, required=True)
 parser.add_argument('--out-directory', type=str, required=True)
+parser.add_argument('--anchors_path', type=str, required=True)
+parser.add_argument('--preprocessed_data_path', type=str, required=True)
 
 args = parser.parse_args()
 
@@ -34,15 +36,22 @@ classes = args.classes
 grid_size = (args.grid_size, args.grid_size)
 num_anchors = args.num_anchors
 
-with open(os.path.join(args.out_directory, "akida_yolov2_anchors.pkl"), 'rb') as handle:
-    anchors = pickle.load(handle)
+# with open(os.path.join(args.out_directory, "akida_yolov2_anchors.pkl"), 'rb') as handle:
+#     anchors = pickle.load(handle)
+
+with open(args.anchors_path, 'rb') as handle:
+        anchors = pickle.load(handle)
 
 # Load the pretrained model along with anchors
 pretrained_model, anchors = load_quantized_model("akidanet_yolo_trained_iq8_wq4_aq4.h5"), anchors
 float32_model = load_model("akidanet_yolo_trained.h5")
 
-with open('preprocessed_data.pkl', 'rb') as handle:
-    all_data, val_data, labels = pickle.load(handle)
+# with open(os.path.join(args.out_directory, 'preprocessed_data.pkl'), 'rb') as handle:
+#     all_data, val_data, labels = pickle.load(handle)
+
+with open(args.preprocessed_data_path, 'rb') as handle:
+        all_data, val_data, labels = pickle.load(handle)
+
 
 # Define the final reshape and build the model
 output = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), name="YOLO_output")(pretrained_model.output)
@@ -52,6 +61,7 @@ output = Reshape((grid_size[1], grid_size[0], num_anchors, 4 + 1 + classes), nam
 model_keras_f32 = Model(float32_model.input, output)
 
 # Check model compatibility
+print("Checking model compatibility: \n")
 compatibility = check_model_compatibility(model_keras, False)
 
 ######################################################################
@@ -72,12 +82,15 @@ model_keras_f32 = Model(model_keras_f32.input, model_keras_f32.layers[-2].output
 
 model_akida = convert(compatible_model)
 model_akida.summary()
+
 model_akida.save(os.path.join(args.out_directory, "akida_model.fbz"))
 h5_path = os.path.join(args.out_directory, "model.h5")
 model_keras_f32.save(h5_path, save_format='h5')
+
 with zipfile.ZipFile(h5_path + '.zip', "w", compression=zipfile.ZIP_DEFLATED) as zf:
     zf.write(h5_path, os.path.basename(h5_path))
 os.remove(h5_path)
+
 print("Model Saved as akida_model.fbz and model.h5.zip")
 
 saved_model_dir = os.path.join(args.out_directory, "saved_model")
@@ -88,6 +101,7 @@ print("Model Input Shape: ", MODEL_INPUT_SHAPE)
 
 # Create tflite files (f32 / i8)
 convert_to_float32(model_keras_f32, args.out_directory, MODEL_INPUT_SHAPE, 'model.tflite')
+print("Model saved as 'model.tflite'. \n")
 
 
 ######################################################################

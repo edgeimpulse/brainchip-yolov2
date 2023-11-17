@@ -39,6 +39,7 @@ parser.add_argument('--grid_size', type=int, required=True)
 parser.add_argument('--num_anchors', type=int, required=True)
 parser.add_argument('--classes', type=int, required=True)
 parser.add_argument('--anchors_path', type=str, required=True)
+parser.add_argument('--preprocessed_data_path', type=str, required=True)
 
 args = parser.parse_args()
 
@@ -56,7 +57,7 @@ with open(args.anchors_path, 'rb') as handle:
 # Load the pretrained model along with anchors
 pretrained_model, anchors = load_quantized_model("akidanet_yolo_trained_iq8_wq4_aq4.h5"), anchors
 
-with open('preprocessed_data.pkl', 'rb') as handle:
+with open(args.preprocessed_data_path, 'rb') as handle:
         all_data, val_data, labels = pickle.load(handle)
 
 

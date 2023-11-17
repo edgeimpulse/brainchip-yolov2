@@ -138,9 +138,12 @@ dataset.append(all_train_data)
 dataset.append(all_valid_data)
 dataset.append(labels)
 
-print(os.getcwd())
-print(os.listdir(os.getcwd()))
-print(os.listdir(os.path.join(os.getcwd(), 'output')))
+print("Current working dir: ", os.getcwd())
+print(" ")
+print("Contents of dir:\n", os.listdir(os.getcwd()))
+print(" ")
+# print(os.listdir(os.path.join(os.getcwd(), 'output')))
+print("Contents of output dir:\n", os.listdir(os.path.join(os.getcwd(), args.out_directory)))
 
 print(" ")
 print(f"Saving preprocessed data to {os.path.join(args.out_directory, 'preprocessed_data.pkl')}")
@@ -149,6 +152,7 @@ with open(os.path.join(args.out_directory, 'preprocessed_data.pkl'), 'wb') as fi
 # with open('preprocessed_data.pkl', 'wb') as file:
     pickle.dump(dataset, file)
 
+print(" ")
 print(os.listdir(os.getcwd()))
 
 print(" ")
@@ -169,11 +173,14 @@ with open(os.path.join(args.out_directory, 'akida_yolov2_anchors.pkl'), 'wb') as
     pickle.dump(anchors, file)
 
 print(" ")
-print(os.getcwd())
+print("Current working dir: ", os.getcwd())
 print(" ")
-print(os.listdir(os.getcwd()))
+print("Contents of dir:\n", os.listdir(os.getcwd()))
 print(" ")
-print(os.listdir(os.path.join(os.getcwd(), 'output')))
+print("Contents of output dir:\n", os.listdir(os.path.join(os.getcwd(), args.out_directory)))
+print(" ")
+print("Contents of home:\n", os.listdir('/home'))
+# print(os.listdir(os.path.join(os.getcwd(), 'output')))
 print(" ")
 
 print('Generating YOLOv2 anchors OK')

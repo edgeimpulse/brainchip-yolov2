@@ -29,24 +29,23 @@ COPY cnn2snn ./cnn2snn
 RUN sh /app/download_cnn2snn.sh
 RUN pip3 install /app/cnn2snn-2.2.2
 
-COPY download_akida-models.sh ./
-COPY akida-mod ./akida-mod
-RUN sh /app/download_akida-models.sh
-RUN pip3 install /app/akida_models-1.1.3
+#COPY download_akida-models.sh ./
+#COPY akida-mod ./akida-mod
+#RUN sh /app/download_akida-models.sh
+#RUN pip3 install /app/akida_models-1.1.3
 
-#RUN pip3 install akida-models==1.1.3
+RUN pip3 install akida-models==1.1.3
 RUN pip3 install -r requirements-mini.txt
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
-
 #COPY yolo_train.py /usr/local/lib/python3.8/dist-packages/akida_models/detection/yolo_train.py
-#COPY yolo_train.py /usr/local/lib/python3.10/dist-packages/akida_models/detection/yolo_train.py
 
 
 WORKDIR /scripts
 
 ## Grab akidanet imagenet pretrained weights to be used for yolov2
-RUN wget http://data.brainchip.com/models/akidanet/akidanet_imagenet_224_alpha_50.h5
+#RUN wget http://data.brainchip.com/models/akidanet/akidanet_imagenet_224_alpha_50.h5
+RUN wget https://data.brainchip.com/models/yolo/yolo_akidanet_voc.h5
 
 WORKDIR /scripts
 
